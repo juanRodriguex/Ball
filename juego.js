@@ -1,17 +1,32 @@
+//---------------------------
 //Configuración
-
+//---------------------------
 const config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    backgroundColor: '#0000FF',
+    backgroundColor: '#121218',
     scene: {
+        preload:preload,
         create: create,
         update: update
     }
 };
 
+//---------------------------
+//preload
+//---------------------------
+function preload () {
+   this.load.image (
+        "jugador",
+        "assets/img/jugador.png"
+    
+    )
+}
+
+//---------------------------
 //Variables 
+//---------------------------
 
 let jugador;
 let teclaDerecha;
@@ -27,28 +42,9 @@ let obstaculos = [];
 const POS_INICIAL_X = 400;
 const POS_INICIAL_Y = 300;
 
-//Funciones
-
-function create() {
-    jugador = this.add.circle(POS_INICIAL_X, POS_INICIAL_Y, 50, 0xff0000);
-    
-    // Objetivo 1: Círculo amarillo
-    objetivo1_elem = this.add.circle(700, 300, 30, 0xffff00);
-    
-    // Objetivo 2: Cuadrado magenta (Nuevo objetivo)
-    objetivo2_elem = this.add.rectangle(100, 100, 50, 50, 0xff00ff);
-
-    // Obstáculo original + 2 nuevos obstáculos
-    obstaculos.push(this.add.rectangle(500, 300, 50, 150, 0x000000));
-    obstaculos.push(this.add.rectangle(250, 150, 60, 120, 0x000000));
-    obstaculos.push(this.add.rectangle(250, 450, 60, 120, 0x000000));
-
-    salto = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    bajar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-    teclaDerecha = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-    teclaIzquierda = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-    dash = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-}
+//---------------------------
+//funciones
+//---------------------------
 
 // Comprobación de objetivos y colisiones
 
@@ -93,7 +89,34 @@ function verificarObjetivos() {
     }
 }
 
-//Ejecución
+//---------------------------
+//create
+//---------------------------
+function create() {
+    //jugador
+    jugador = this.add.image(POS_INICIAL_X, POS_INICIAL_Y, "jugador");
+    jugador.setDisplaySize(100,100)
+    // Objetivo 1: Círculo amarillo
+    objetivo1_elem = this.add.circle(700, 300, 30, 0xffff00);
+    
+    // Objetivo 2: Cuadrado magenta (Nuevo objetivo)
+    objetivo2_elem = this.add.rectangle(100, 100, 50, 50, 0xff00ff);
+
+    // Obstáculo original + 2 nuevos obstáculos
+    obstaculos.push(this.add.rectangle(500, 300, 50, 150, 0x000000));
+    obstaculos.push(this.add.rectangle(250, 150, 60, 120, 0x000000));
+    obstaculos.push(this.add.rectangle(250, 450, 60, 120, 0x000000));
+
+    salto = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+    bajar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+    teclaDerecha = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+    teclaIzquierda = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+    dash = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+}
+
+//---------------------------
+//update
+//---------------------------
 
 function update() {
     const velocidad = dash.isDown ? 20 : 5;
@@ -116,5 +139,8 @@ function update() {
     verificarObjetivos();
 }
 
-//Instancia
+//---------------------------
+//juego
+//---------------------------
+
 const game = new Phaser.Game(config);
