@@ -5,9 +5,9 @@ const config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    backgroundColor: '#121218',
+    backgroundColor: '#30303a',
     scene: {
-        preload:preload,
+        preload: preload,
         create: create,
         update: update
     }
@@ -16,12 +16,16 @@ const config = {
 //---------------------------
 //preload
 //---------------------------
-function preload () {
-   this.load.image (
+function preload() {
+    this.load.spritesheet(
         "jugador",
-        "assets/img/jugador.png"
-    
-    )
+        "assets/img/jugador.png",
+        {
+            frameWidth: 300,
+            frameHeight: 500
+        }
+    );
+
 }
 
 //---------------------------
@@ -34,6 +38,9 @@ let teclaIzquierda;
 let salto;
 let bajar;
 let dash;
+let vidas= 3
+let puntos= 0
+let moneda
 
 let objetivo1_elem;
 let objetivo2_elem; // Segundo objetivo
@@ -50,7 +57,7 @@ const POS_INICIAL_Y = 300;
 
 function verificarObjetivos() {
     const circuloJugador = new Phaser.Geom.Circle(jugador.x, jugador.y, 50);
-    
+
     // Geometría del Objetivo 1 (Círculo)
     const circuloObjetivo1 = new Phaser.Geom.Circle(objetivo1_elem.x, objetivo1_elem.y, 30);
 
@@ -93,12 +100,64 @@ function verificarObjetivos() {
 //create
 //---------------------------
 function create() {
-    //jugador
-    jugador = this.add.image(POS_INICIAL_X, POS_INICIAL_Y, "jugador");
-    jugador.setDisplaySize(100,100)
+    //jugador-animation
+    jugador = this.add.sprite(
+        POS_INICIAL_X,
+        POS_INICIAL_Y,
+        "jugador");
+
+    jugador.setScale(0.3)
+
+    this.anims.create({
+        key: "caminar",
+        frames: this.anims.generateFrameNumbers(
+            "jugador",
+            {
+                start: 0,
+                end: 3
+            }
+        ),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    //Interfazes 
+
+    textoPuntos = this.add.text(
+        20,
+        20,
+        "puntos: 0",
+        {
+fontSize: "24px",
+fill: "#ffffff"
+
+        }
+    )
+
+    textoVidas = this.add.text(
+        20,
+        50,
+        "vidas: 3",
+        {
+            fontSize: "24px",
+            fill:"#ffffffff"
+        }
+    )
+
+
+
+//Moneda
+
+        moneda= this.add.circle(
+            600,
+            250,
+            20,
+            0x00ff00
+        )
+
     // Objetivo 1: Círculo amarillo
     objetivo1_elem = this.add.circle(700, 300, 30, 0xffff00);
-    
+
     // Objetivo 2: Cuadrado magenta (Nuevo objetivo)
     objetivo2_elem = this.add.rectangle(100, 100, 50, 50, 0xff00ff);
 
@@ -122,16 +181,51 @@ function update() {
     const velocidad = dash.isDown ? 20 : 5;
 
     if (teclaDerecha.isDown) {
+
         jugador.x += velocidad;
-    } else if (teclaIzquierda.isDown) {
-        jugador.x -= velocidad;
+        jugador.anims.play("caminar", true);
+        jugador.setFlipX(false);
     }
 
-    if (salto.isDown) {
-        jugador.y -= velocidad;
-    } else if (bajar.isDown) {
-        jugador.y += velocidad;
+
+    else if (teclaIzquierda.isDown) {
+        jugador.x -= velocidad;
+        jugador.anims.play("caminar", true);
+        jugador.setFlipX(true);
     }
+
+    else if (salto.isDown) {
+        jugador.y -= velocidad;
+        jugador.anims.play("caminar", true);
+    } 
+    
+    else if (bajar.isDown) {
+        jugador.y += velocidad;
+        jugador.anims.play("caminar", true);
+
+
+    }
+
+    else {
+        jugador.anims.stop();
+    }
+let distaciaMoneda = 
+Phaser.Math.Distance.Between(
+    jugador.x,
+    jugador.y,
+    moneda.x,
+    moneda.y
+)
+
+if(distaciaMoneda < 50){
+    puntos += 10
+
+    textoPuntos.setText(
+        "Puntos: "+puntos
+    )
+    moneda.setVisible(false)
+}
+
 
     jugador.x = Phaser.Math.Clamp(jugador.x, 50, 750);
     jugador.y = Phaser.Math.Clamp(jugador.y, 50, 550);
